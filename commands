@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+source "$(dirname $0)/../dokku_common"
+source "$(dirname $0)/vars"
+
+case "$1" in
+	nginx:cache:enable)
+		verify_app_name "$2"
+		verify_max_args 2 "$@"
+
+		mkdir -p $CACHE_DIR
+		echo Enabled Nginx proxy cache for $APP
+
+		redeploy_app "$APP"
+		;;
+
+	nginx:cache:disable)
+		verify_app_name "$2"
+		verify_max_args 2 "$@"
+
+		rm -rf $DOKKU_ROOT/$APP/NGINX_CACHE
+		echo Disabled Nginx proxy cache for $APP
+
+		redeploy_app "$APP"
+		;;
+
+	help | nginx:help | nginx:cache:help)
+		cat && cat <<-EOF
+		    nginx:cache:enable <app>                Enable Nginx proxy cache for an app
+		    nginx:cache:disable <app>               Disable Nginx proxy cache for an app
+		EOF
+		;;
+
+	*)
+		exit $DOKKU_NOT_IMPLEMENTED_EXIT
+		;;
+esac
